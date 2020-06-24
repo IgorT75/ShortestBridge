@@ -13,6 +13,7 @@ int shortestBridge(vector<vector<int>>& vec) {
 
 	// find 1st one in array
 	std::queue<size_t> qRow, qCol;
+	vector<size_t> srcIsland;
 
 	const size_t nRows = vec.size(), nCols = vec.front().size();
 	size_t row = 0, col = 0;
@@ -23,13 +24,13 @@ int shortestBridge(vector<vector<int>>& vec) {
 		if (it != vec[row].end()) {
 			col = std::distance(vec[row].begin(), it);
 			qRow.push(row); qCol.push(col);
+			srcIsland.push_back(nCols * row + col);
 			break;
 		}
 	}
 
 	// run BFS to find all positions of this island
 	vector<vector<int>> dirs { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
-	vector<size_t> srcIsland { nCols * row + col };
 	while (!qRow.empty()) {
 		row = qRow.front(); col = qCol.front();
 		qRow.pop(); qCol.pop();
@@ -58,7 +59,7 @@ int shortestBridge(vector<vector<int>>& vec) {
 	// run BFS on all positions from srcIsland - stop on 1st alien 1 encountered
 	int nSteps = 0;
 	queue<size_t> qRow1, qCol1;
-	while (true) {
+	while (!qRow.empty()) { // empty here means there is no 2nd island
 		while (!qRow.empty()) {
 			row = qRow.front(); col = qCol.front();
 			qRow.pop(); qCol.pop();
@@ -76,6 +77,7 @@ int shortestBridge(vector<vector<int>>& vec) {
 				if (vec[nextRow][nextCol] == 1)
 					return nSteps;
 
+				srcIsland.push_back(p); // it's visited
 				qRow1.push(nextRow); qCol1.push(nextCol);
 			}
 		}
@@ -89,8 +91,8 @@ int main() {
 
 	vector<vector<int>> vec{ {1, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1} };
 	vec = { {1, 0, 0}, {0, 0, 0}, {0, 0, 1} };
-	vec = { {0,1}, {1,0} };
-	vec = { {0,0,0,0,0,0},{0,1,0,0,0,0},{1,1,0,0,0,0},{1,1,0,0,0,0},{0,0,0,0,0,0},{0,0,1,1,0,0 }};
+	//vec = { {1,0}, {0,1} };
+	//vec = { {0,0,0,0,0,0},{0,1,0,0,0,0},{1,1,0,0,0,0},{1,1,0,0,0,0},{0,0,0,0,0,0},{0,0,1,1,0,0 }};
 	int nLen = shortestBridge(vec);
 	printf("%d\n", nLen);
 
